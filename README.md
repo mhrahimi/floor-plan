@@ -7,6 +7,7 @@ A simple floor plan drawing tool that runs entirely in the browser. There's no b
 - **Walls**: click corner to corner. While drawing, type an exact length (`3.5`, `350cm`, `12'6"`) and press Enter.
 - **Rooms**: drag a rectangle and walls are built around it, or type a size like `4 x 3`. To name a space you've already enclosed, click inside its walls. Closing a wall loop asks for the room's name, and every room shows its area.
 - **Doors and windows**: single, double and sliding doors, windows, and open doorways. They snap onto walls and cut the opening. You can flip the swing or hinge side and set the exact distance from either end of the wall.
+- **Heights**: each drawing has a ceiling height and default door, window and window-sill heights (2.5 m, 2.1 m, 1.2 m and 0.9 m; 8', 6' 8", 4' and 32" in feet and inches), set under *Heights* in the panel when nothing is selected. Select a room to give it its own ceiling height (its volume is shown too), a door or open doorway to set its height, or a window to set its width, height and sill height (how high it starts above the floor). Select several to set them all at once. Anything without its own height follows the drawing's.
 - **Stairs and objects**: straight and spiral stairs, columns, kitchen and bath fixtures, and furniture. You can move, rotate, mirror, resize and label them.
 - **Dimensions**: wall lengths are shown automatically. The dimension tool measures between any two points, and one click adds overall dimensions.
 - **Units**: metres, centimetres, millimetres, feet and inches, or inches. Switching units at any time just changes how lengths are shown.
@@ -15,8 +16,19 @@ A simple floor plan drawing tool that runs entirely in the browser. There's no b
 - **Export as PNG**: choose Small, Medium or Large (1200, 2400 or 4000 px on the long side) and a white or transparent background. You can also turn the title and scale bar, room names, areas and colours, wall lengths, dimension lines, furniture and grid on or off. A live preview shows the result. Download it, or copy it straight to the clipboard.
 - Also exports SVG and print/PDF.
 - **Apple Pencil**: once the Pencil touches the screen, the Pencil draws and edits, and your fingers only pan and pinch to zoom, so a resting palm won't draw anything. Draw a wall with one Pencil stroke or tap from corner to corner, then tap **Finish**. Without a Pencil, fingers draw as usual. You can turn this off in the panel under View.
+- **3D preview (experimental)**: switch to 3D in the bottom-left corner of the canvas to look at the plan in 3D, with room colours, doors, windows, stairs and furniture. See below.
 - **Installable and offline**: after the first visit, the app opens and works with no connection. New versions you deploy show up the next time it's opened online.
 - Undo and redo, snapping (hold Alt to turn it off), keyboard shortcuts (press `?` in the app), and touch support with pinch to zoom.
+
+## 3D preview (experimental)
+
+Use the **Plan / 3D** switch in the bottom-left corner of the canvas.
+
+- **Look around**: drag to orbit. To move, right-drag, Shift-drag or use two fingers. Scroll or pinch to zoom. Arrow keys orbit, `+` and `-` zoom, `0` resets, and `Esc` goes back to the plan.
+- **Settings** (bar at the top of the 3D view): show or hide furniture and room names, Reset view, Top view, and **Save image**, which saves a PNG of the current view.
+- **What it shows**: each stretch of wall rises to the ceiling height of the room next to it (the taller one where two rooms meet, the drawing's ceiling height where there's no room). Openings are cut out at their own heights: doors are shown open, and windows have glass from the sill to the top of the window. A window taller than its wall stops at the top of the wall. Rooms show their floor colour, stairs climb to the ceiling of their room, and furniture uses typical heights.
+- **It's a preview only.** The 3D view can't change your drawing: editing shortcuts don't work while it's open. Edits made in the side panel, and undo or redo, show up in 3D straight away. Picking a drawing tool switches back to the plan.
+- **It stays out of the way.** `view3d.js` is only downloaded the first time 3D is opened, so the editor starts just as fast as before. If the 3D view can't run (for example the browser has WebGL turned off), it says so and the plan carries on normally. To hide the 3D button completely, untick **Show the 3D preview** under View in the right-hand panel.
 
 ## Files
 
@@ -25,6 +37,7 @@ A simple floor plan drawing tool that runs entirely in the browser. There's no b
 | `index.html` | The whole app |
 | `manifest.webmanifest` | App name, icons and colours used when it's installed |
 | `sw.js` | Service worker that makes it work offline |
+| `view3d.js` | The experimental 3D preview, loaded only when 3D is opened |
 | `icons/` | App icons (Android, iPhone/iPad, desktop, favicon) |
 | `screenshots/` | Previews shown in Chrome's install dialog |
 
@@ -58,7 +71,7 @@ Opening `index.html` directly still works for drawing; it just won't install or 
 
 ## Publishing updates
 
-- Changes to `index.html` reach users the next time they open the app while online. There's nothing else to do.
+- Changes to `index.html` and `view3d.js` reach users the next time they open the app while online. There's nothing else to do.
 - If you change the icons or `manifest.webmanifest`, also change `VERSION` in `sw.js` (for example `'v1'` → `'v2'`). The app then replaces its offline copy and removes the old one.
 
 ## Where drawings are stored
