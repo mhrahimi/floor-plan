@@ -5,7 +5,7 @@
  * When you change icons or the manifest, bump VERSION so the cache refreshes.
  * (index.html and view3d.js are always fetched fresh when online, so they don't need it.)
  */
-const VERSION = 'v3';
+const VERSION = 'v5';
 const CACHE = 'floorplanner-' + VERSION;
 const NETWORK_TIMEOUT_MS = 3500;   // after this, an open-but-slow network falls back to the cached app
 const ASSETS = [

@@ -78,6 +78,9 @@ button{cursor:pointer;touch-action:manipulation}
 #left{grid-area:left;border-right:1px solid var(--rule);overflow-y:auto;padding:8px 10px 18px max(10px,var(--sal))}
 .sech{font-weight:650;font-size:12px;color:var(--ink-2);margin:14px 4px 6px}
 .sech:first-child{margin-top:4px}
+.sech.ppl{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px}
+.seg.sm{display:inline-flex;padding:1px;border-radius:7px;gap:1px}
+.seg.sm button{flex:none;height:22px;padding:0 8px;font-size:11.5px;border-radius:6px}
 .tools{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
 .tool{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;height:54px;padding:0 2px;border-radius:8px;border:1px solid transparent;background:transparent;font-size:11.5px;min-width:0}
 .tool svg{width:20px;height:20px;flex:none}
@@ -101,19 +104,13 @@ kbd{font:11px/1.5 var(--font);color:var(--ink-2);background:#fff;border:1px soli
 #toolopts .tname{font-weight:600}
 #toolopts button{height:28px;border:1px solid var(--rule);background:#fff;border-radius:7px;padding:0 9px}
 #toolopts button:hover{background:var(--chrome)}
+#toolopts .seg button{height:24px;border:0;background:transparent;padding:0 9px}
+#toolopts .seg button[aria-checked=true]{background:#fff}
 #zoombar{position:absolute;right:12px;bottom:12px;display:flex;align-items:center;background:#fff;border:1px solid var(--rule);border-radius:10px;padding:3px;box-shadow:0 2px 10px rgba(30,35,40,.06)}
 #zoombar button{width:32px;height:30px;border:0;background:transparent;border-radius:7px;display:grid;place-items:center}
 #zoombar button:hover{background:var(--chrome)}
 #zoombar svg{width:17px;height:17px}
 #zoomPct{min-width:48px;text-align:center;font-variant-numeric:tabular-nums;color:var(--ink-2);font-size:12px}
-#empty{position:absolute;inset:0;display:grid;place-items:center;pointer-events:none;padding:20px}
-#empty .ecard{pointer-events:auto;background:#fff;border:1px solid var(--rule);border-radius:14px;padding:22px 24px 20px;max-width:380px;box-shadow:0 10px 30px rgba(30,35,40,.08)}
-#empty h2{font-size:18px;margin:0 0 6px;letter-spacing:-.01em}
-#empty p{margin:0 0 14px;color:var(--ink-2)}
-#empty .row{display:flex;gap:8px;flex-wrap:wrap}
-#empty .pbtn{height:34px}
-#empty .note{margin:14px 0 0;padding-top:12px;border-top:1px solid var(--rule);font-size:12.5px;color:var(--ink-2)}
-#empty .link{border:0;background:none;color:var(--accent-ink);padding:0;margin-top:12px;text-decoration:underline;text-underline-offset:2px}
 .floatin{position:absolute;z-index:5;background:#fff;border:1.5px solid var(--accent);border-radius:8px;box-shadow:0 6px 18px rgba(20,25,30,.15)}
 #inlineEdit{height:32px;width:190px;padding:0 9px;font-weight:600;text-align:center}
 #inlineEdit:focus{outline:none}
@@ -174,6 +171,10 @@ input.bad{border-color:var(--danger)!important;background:#fff5f5!important}
 .v3dbar .tname{font-weight:600}
 .v3dbar button{height:28px;border:1px solid var(--rule);background:#fff;border-radius:7px;padding:0 9px}
 .v3dbar button:hover{background:var(--chrome)}
+.v3dbar .seg button{height:24px;border:0;background:transparent;padding:0 10px}
+.v3dbar .seg button[aria-checked=true]{background:#fff}
+#v3d .v3dspot{position:absolute;left:0;top:0;border:2px solid #fff;border-radius:50%;background:rgba(255,255,255,.3);box-shadow:0 0 0 1px rgba(30,35,40,.22);pointer-events:none;z-index:1}
+#v3d.walking .v3dcanvas{cursor:crosshair}
 #v3dStatus{position:absolute;inset:0;z-index:3;display:grid;place-items:center;padding:20px;pointer-events:none}
 #v3dStatus .ecard{pointer-events:auto;background:#fff;border:1px solid var(--rule);border-radius:14px;padding:18px 22px;max-width:360px;box-shadow:0 10px 30px rgba(30,35,40,.08);text-align:center}
 #v3dStatus p{margin:0 0 12px;color:var(--ink-2)}
@@ -291,18 +292,6 @@ input.bad{border-color:var(--danger)!important;background:#fff5f5!important}
     </g>
   </svg>
   <div id="toolopts"></div>
-  <div id="empty" hidden>
-    <div class="ecard">
-      <h2>Start your floor plan</h2>
-      <p>Drag out a room, or trace walls corner by corner. You can type exact lengths while you draw.</p>
-      <div class="row">
-        <button class="pbtn dark" data-tool="room">Draw a room <kbd>R</kbd></button>
-        <button class="pbtn" data-tool="wall">Draw walls <kbd>W</kbd></button>
-      </div>
-      <button class="link" id="bExample">Or open the example apartment</button>
-      <p class="note" id="iosNote" hidden>Drawings you made in Safari aren’t shared with the Home Screen app. To bring them over, open Floor Planner in Safari, choose Export → All saved drawings, then use Import here.</p>
-    </div>
-  </div>
   <div id="zoombar">
     <button id="zOut" title="Zoom out (−)" aria-label="Zoom out"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 12h12"/></svg></button>
     <span id="zoomPct">100%</span>
@@ -460,13 +449,30 @@ const LIB = {
   desk: {n: 'Desk', cat: 3, s: [[120, 90], [48, 36]]},
   wardrobe: {n: 'Wardrobe', cat: 3, s: [[120, 60], [48, 24]]},
   box: {n: 'Box', cat: 3, s: [[100, 60], [40, 24]]},
+  standing: {n: 'Standing', cat: 4, person: 1},
+  walking: {n: 'Walking', cat: 4, person: 1},
+  sitting: {n: 'Sitting', cat: 4, person: 1},
+  wheelchair: {n: 'Wheelchair', cat: 4, person: 1},
 };
-const CATS = ['Doors and windows', 'Stairs and structure', 'Kitchen and bath', 'Furniture'];
+const CATS = ['Doors and windows', 'Stairs and structure', 'Kitchen and bath', 'Furniture', 'People'];
+/* people, for scale: sized by their height; the footprint (seen from above) follows from pose, style and height */
+const PEOPLE = ['standing', 'walking', 'sitting', 'wheelchair'], STYLES = [['male', 'Male'], ['female', 'Female']];
+const PERSON_BASE = {male: 175, female: 163}, PERSON_LIMITS = {min: 50, max: 250};
+const PERSON_FOOT = {standing: {male: [55, 32.5], female: [48, 30.6]}, walking: {male: [55, 66.5], female: [48, 62]}, sitting: {male: [55, 69.3], female: [48, 64.3]}};
+const isPerson = t => !!(LIB[t] && LIB[t].person);
+const personStyle = v => v === 'female' ? 'female' : 'male';
+const personDefaultHeight = (style, units = doc.units) => isImp(units) ? (style === 'female' ? 64 : 69) * IN : PERSON_BASE[style];   // 5' 4" and 5' 9"
+function personSize(type, style, height) {
+  if (type === 'wheelchair') return [59, 84];   // the chair sets the footprint
+  const k = height / PERSON_BASE[style], b = PERSON_FOOT[type][style]; return [b[0] * k, b[1] * k];
+}
+function fitPerson(it) { [it.w, it.h] = personSize(it.type, it.style, it.height); }
 const OPTYPES = ['door', 'door2', 'slide', 'window', 'open'];
 const ROOM_COLORS = [['#efe6d3', 'Sand'], ['#dce9dc', 'Sage'], ['#dbe7f1', 'Sky'], ['#f1dfda', 'Rose'], ['#e6e0ef', 'Lilac'], ['#f2eac6', 'Butter'], ['#e3e5e1', 'Stone'], ['#ffffff', 'White']];
 const ROOM_NAMES = ['Living room', 'Kitchen', 'Dining room', 'Bedroom', 'Primary bedroom', 'Guest room', 'Bathroom', 'En suite', 'Powder room', 'Hallway', 'Entry', 'Office', 'Closet', 'Walk-in closet', 'Laundry', 'Pantry', 'Garage', 'Storage', 'Family room', 'Balcony', 'Porch', 'Utility'];
 function defSize(t) {
   const L = LIB[t], imp = isImp(doc.units);
+  if (L.person) { const st = personStyle(prefs.personStyle); return personSize(t, st, personDefaultHeight(st)); }
   if (L.op) return imp ? L.w[1] * IN : L.w[0];
   const [m, i] = L.s; return imp ? [i[0] * IN, i[1] * IN] : m.slice();
 }
@@ -549,7 +555,74 @@ const SYM = {
     return R(-w / 2, -h / 2, w, h, 'sym', 1) + Pt(M(-w / 2 + 4, 0) + `H${f(w / 2 - 4)}`, 'symD') + Pt(d, 'symT');
   },
   box: (w, h) => R(-w / 2, -h / 2, w, h, 'sym', 2),
+  /* people, seen from above, facing +y (where the feet point); the head shows their hair */
+  standing(w, h, it) {
+    const fx = w * .151, fw = w * .095, hy = -h * .146, r = Math.min(w * .17, h * .33);
+    return R(-fx - fw, -h * .31, fw * 2, h * .81, 'sym', fw * .9) + R(fx - fw, -h * .31, fw * 2, h * .81, 'sym', fw * .9)
+      + E(0, -h * .145, w / 2, h * .355) + Pt(M(-w * .345, -h * .4) + `Q${f(-w * .31)} ${f(-h * .14)} ${f(-w * .345)} ${f(h * .1)}` + M(w * .345, -h * .4) + `Q${f(w * .31)} ${f(-h * .14)} ${f(w * .345)} ${f(h * .1)}`, 'symT')
+      + headSym(0, hy, r, it);
+  },
+  walking(w, h, it) {
+    const fx = w * .151, fw = w * .095, ty = -h * .118, r = Math.min(w * .17, h * .16), sh = w * .345;
+    return R(-fx - fw, h * .02, fw * 2, h * .48, 'sym', fw * .9) + R(fx - fw, -h * .5, fw * 2, h * .45, 'sym', fw * .9)   // left foot ahead, right behind
+      + R(-w / 2, ty - h * .27, w * .17, h * .31, 'sym', w * .08) + R(w * .33, ty - h * .04, w * .17, h * .31, 'sym', w * .08)   // arms swing the other way
+      + E(0, ty, w * .42, h * .19) + headSym(0, ty, r, it);
+  },
+  sitting(w, h, it) {
+    const ty = -h * .333, r = Math.min(w * .17, h * .155), sh = w * .345;
+    return R(-w * .245, h * .12, w * .19, h * .38, 'sym', w * .08) + R(w * .055, h * .12, w * .19, h * .38, 'sym', w * .08)   // feet
+      + R(-w * .27, -h * .447, w * .237, h * .795, 'sym', w * .09) + R(w * .033, -h * .447, w * .237, h * .795, 'sym', w * .09)   // thighs
+      + R(-w * .415, -h * .4, w * .139, h * .63, 'sym', w * .06) + R(w * .276, -h * .4, w * .139, h * .63, 'sym', w * .06)   // forearms
+      + R(-w / 2, -h * .5, w, h * .333, 'sym', h * .14) + headSym(0, ty + h * .02, r, it);
+  },
+  wheelchair(w, h, it) {
+    let s = R(-w * .466, -h * .44, w * .051, h * .714, 'symF', 1) + R(w * .415, -h * .44, w * .051, h * .714, 'symF', 1)   // big wheels
+      + R(-w * .339, h * .224, w * .051, h * .166, 'sym', 1) + R(w * .288, h * .224, w * .051, h * .166, 'sym', 1)   // casters
+      + R(-w * .322, h * .145, w * .297, h * .355, 'symB', 1.5) + R(w * .025, h * .145, w * .297, h * .355, 'symB', 1.5)   // footrests
+      + R(-w * .356, -h * .5, w * .712, h * .76, 'symB', 2)   // seat and back
+      + R(-w * .407, -h * .369, w * .051, h * .534, 'sym', 1) + R(w * .356, -h * .369, w * .051, h * .534, 'sym', 1);   // armrests
+    s += R(-w * .23, h * .167, w * .17, h * .312, 'sym', w * .07) + R(w * .06, h * .167, w * .17, h * .312, 'sym', w * .07)   // feet
+      + R(-w * .25, -h * .302, w * .22, h * .655, 'sym', w * .08) + R(w * .03, -h * .302, w * .22, h * .655, 'sym', w * .08)   // thighs
+      + R(-w * .387, -h * .266, w * .129, h * .526, 'sym', w * .05) + R(w * .258, -h * .266, w * .129, h * .526, 'sym', w * .05)   // forearms
+      + R(-w * .322, -h * .345, w * .644, h * .274, 'sym', h * .11) + headSym(0, -h * .188, Math.min(w * .158, h * .11), it);
+    return s;
+  },
 };
+function headSym(x, y, r, it) {
+  if (!it || it.style !== 'female') return C(x, y, r, 'symH');
+  const t = y - r * 2.05;   // long hair falls down the back
+  return Pt(M(x - r, y) + `A${f(r)} ${f(r)} 0 0 0 ${f(x + r)} ${f(y)}C${f(x + r * 1.08)} ${f(y - r * .95)} ${f(x + r * .72)} ${f(t + r * .12)} ${f(x)} ${f(t)}`
+    + `C${f(x - r * .72)} ${f(t + r * .12)} ${f(x - r * 1.08)} ${f(y - r * .95)} ${f(x - r)} ${f(y)}Z`, 'symH');
+}
+/* palette pictures of people: front or side views, easier to tell apart than the view from above */
+function personThumb(key, style) {
+  const fem = style === 'female', hairBack = (x, y) => fem ? R(x - 13, y - 12, 26, 33, 'symH', 11) : '';
+  const head = (x, y, side) => hairBack(x - (side ? 3 : 0), y) + C(x, y + 1, 10.5) + (fem ? Pt(M(x - 10.5, y + 1) + `A10.5 10.5 0 0 1 ${x + 10.5} ${y + 1}Q${x} ${y - 6} ${x - 10.5} ${y + 1}Z`, 'symH')
+    : Pt(M(x - 10.8, y + 2) + `A10.8 10.8 0 0 1 ${x + 10.8} ${y + 2}Q${x + (side ? 4 : 0)} ${y - 5} ${x - 10.8} ${y + 2}Z`, 'symH'));
+  const limb = (x, y, ang, w, l) => `<g transform="translate(${x} ${y}) rotate(${ang})">${R(-w / 2, 0, w, l, 'sym', w / 2)}</g>`;
+  const torso = (x, y, hgt, wTop, wBot) => Pt(`M${x - wTop} ${y + 6}Q${x - wTop} ${y} ${x - wTop + 6} ${y}H${x + wTop - 6}Q${x + wTop} ${y} ${x + wTop} ${y + 6}L${x + wBot} ${y + hgt - 4}Q${x + wBot} ${y + hgt} ${x + wBot - 4} ${y + hgt}H${x - wBot + 4}Q${x - wBot} ${y + hgt} ${x - wBot} ${y + hgt - 4}Z`, 'sym');
+  let body, vb;
+  if (key === 'standing') {
+    const sw = fem ? 15 : 17.5, hw = fem ? 18 : 16.5;
+    body = R(-15, 92, 13, 82, 'sym', 5) + R(2, 92, 13, 82, 'sym', 5) + R(-sw - 7.5, 33, 8, 60, 'sym', 4) + R(sw - .5, 33, 8, 60, 'sym', 4) + torso(0, 29, 71, sw, hw) + head(0, 15);
+    vb = [-34, 0, 68, 178];
+  } else if (key === 'walking') {
+    body = limb(-2, 38, -26, 9, 58) + limb(0, 94, 18, 13, 80) + limb(0, 94, -20, 13, 80) + Pt(M(-12, 33) + `H11Q13 33 13 40L${fem ? 15 : 12} 96H${fem ? -15 : -12}L-13 40Q-13 33 -11 33Z`, 'sym') + limb(2, 38, 30, 9, 58) + head(3, 16, 1);
+    vb = [-45, 0, 92, 178];
+  } else if (key === 'sitting') {
+    body = R(-24, 70, 5, 50, 'symB', 2) + R(-22, 116, 44, 5, 'symB', 2) + Pt('M-18 121V174M18 121V174', 'symL')
+      + torso(-6, 47, 70, fem ? 12 : 13, fem ? 14 : 13) + R(-14, 101, 54, 16, 'sym', 7) + R(27, 104, 13, 66, 'sym', 6) + R(27, 163, 24, 9, 'sym', 4)
+      + limb(-6, 53, 0, 9, 44) + R(-10, 90, 34, 9, 'sym', 4.5) + head(-4, 31, 1);
+    vb = [-32, 14, 88, 162];
+  } else {
+    body = R(-24, 70, 5, 50, 'symB', 2) + Pt('M-22 72H-34M-20 121H22L36 160H52', 'symL')
+      + torso(-6, 47, 70, fem ? 12 : 13, fem ? 14 : 13) + R(-14, 101, 54, 16, 'sym', 7) + R(27, 104, 13, 56, 'sym', 6) + R(27, 152, 24, 9, 'sym', 4)
+      + limb(-6, 53, 0, 9, 44) + R(-10, 90, 34, 9, 'sym', 4.5) + head(-4, 31, 1)
+      + `<circle class="symL" cx="-2" cy="140" r="33"/><circle class="symT" cx="-2" cy="140" r="28"/>` + C(-2, 140, 3.5, 'symF') + C(38, 167, 7);
+    vb = [-40, 14, 96, 162];
+  }
+  return `<svg viewBox="${vb.join(' ')}" preserveAspectRatio="xMidYMid meet"><g class="it">${body}</g></svg>`;
+}
 function openingBody(type, W, t) {
   const h = t / 2, x0 = -W / 2, x1 = W / 2;
   const jamb = Pt(M(x0, -h) + `V${f(h)}` + M(x1, -h) + `V${f(h)}`, 'opJ');
@@ -606,6 +679,10 @@ function normalizeDoc(src) {
     if (!LIB[it.type] || LIB[it.type].op) continue;
     const ni = {id: take(it.id, 'i'), type: it.type, x: N(it.x), y: N(it.y), w: Math.max(2, N(it.w, 60)), h: Math.max(2, N(it.h, 60)), rot: N(it.rot), flip: !!it.flip, label: String(it.label ?? '').slice(0, 60)};
     if (it.type === 'stairs') ni.steps = clamp(Math.round(N(it.steps, ni.h / 25)), 2, 60);
+    if (LIB[it.type].person) {
+      ni.style = personStyle(it.style); const ht = N(it.height, 0);
+      ni.height = ht >= PERSON_LIMITS.min && ht <= PERSON_LIMITS.max ? ht : personDefaultHeight(ni.style, units); fitPerson(ni);
+    }
     out.items.push(ni);
   }
   for (const m of Array.isArray(d.dims) ? d.dims : []) out.dims.push({id: take(m.id, 'd'), x1: N(m.x1), y1: N(m.y1), x2: N(m.x2), y2: N(m.y2), off: N(m.off)});
@@ -618,7 +695,7 @@ function normalizeDoc(src) {
 const LS = {index: 'floorplanner.index.v1', doc: id => 'floorplanner.doc.v1.' + id, auto: 'floorplanner.autosave.v1', prefs: 'floorplanner.prefs.v1'};
 const lsGet = k => { try { return localStorage.getItem(k); } catch (e) { return null; } };
 const lsSet = (k, v) => { try { localStorage.setItem(k, v); return true; } catch (e) { return false; } };
-const prefs = Object.assign({units: 'm', grid: true, snap: true, autoRoom: true, roomWalls: true}, JSON.parse(lsGet(LS.prefs) || '{}'));
+const prefs = Object.assign({units: 'm', grid: true, snap: true, autoRoom: true, roomWalls: true, personStyle: 'male'}, JSON.parse(lsGet(LS.prefs) || '{}'));
 const savePrefs = () => lsSet(LS.prefs, JSON.stringify(prefs));
 
 let doc = newDoc(prefs.units);
@@ -626,7 +703,7 @@ const current = {id: null, saved: ''};
 const view = {s: .5, tx: 0, ty: 0};
 const sel = new Set();
 const hist = {u: [], r: []};
-let tool = 'select', placeType = null, ghostState = {rot: 0, flip: false, hinge: false};
+let tool = 'select', placeType = null, ghostState = {rot: 0, flip: false, hinge: false}, hoverLen = null;
 let draft = null, drag = null, hoverId = null, hoverHandle = null, inline = null, typein = null, pinch = null;
 let altDown = false, shiftDown = false, spaceDown = false;
 const cur = {sp: P(0, 0), wp: P(0, 0), snap: null, inside: false, ghost: null};
@@ -728,9 +805,9 @@ function svgCSS(ui = 1) {
 .sym{fill:#fff}.symB{fill:#f0eee9}.symC{fill:#efeee9}
 .symL,.symA,.symT,.symD{fill:none;stroke:#2e333a;stroke-width:${k(1)};vector-effect:non-scaling-stroke;stroke-linecap:round;stroke-linejoin:round}
 .symA{stroke-width:${k(1.4)}}.symT{stroke:#8c929b;stroke-width:${k(.85)}}.symD{stroke:#8c929b;stroke-dasharray:${k(4)} ${k(3)}}
-.symF{fill:#2e333a}
+.symF{fill:#2e333a}.symH{fill:#8b9099;stroke:#2e333a;stroke-width:${k(1)};vector-effect:non-scaling-stroke}
 .it.hov .sym,.it.hov .symB,.it.hov .symC,.it.hov .symL{stroke:#5d6875}
-.it.sel .sym,.it.sel .symB,.it.sel .symC,.it.sel .symL,.it.sel .symA,.it.sel .symT{stroke:${ACC}}.it.sel .symF{fill:${ACC}}
+.it.sel .sym,.it.sel .symB,.it.sel .symC,.it.sel .symL,.it.sel .symA,.it.sel .symT,.it.sel .symH{stroke:${ACC}}.it.sel .symF{fill:${ACC}}
 .opJ,.opArc,.opLeaf,.opWin,.opGlass,.opDash,.opPanel{fill:none;stroke:#262a30;stroke-width:${k(1)};vector-effect:non-scaling-stroke}
 .opLeaf{stroke-width:${k(2.2)};stroke-linecap:round}.opArc{stroke:#7f858e;stroke-width:${k(.9)}}
 .opWin,.opPanel{fill:#fff}.opWin{stroke-width:${k(1.1)}}.opDash{stroke:#7f858e;stroke-dasharray:${k(4)} ${k(3)}}
@@ -742,7 +819,7 @@ function svgCSS(ui = 1) {
 .dim.tmp path{stroke:${ACC}}.dim.tmp text{fill:#11598c}
 text{font-family:${FONT};paint-order:stroke;stroke:rgba(255,255,255,.92);stroke-linejoin:round;font-variant-numeric:tabular-nums}
 .rn{fill:#23272d;font-weight:650}.ra{fill:#656b74;font-weight:500}.rn.sel{fill:${ACC}}
-.wl{fill:#7a8089;font-weight:500}.il{fill:#3a3f46;font-weight:500}
+.wl{fill:#7a8089;font-weight:500}.wl.hov{fill:${ACC};text-decoration:underline}.il{fill:#3a3f46;font-weight:500}
 .tx{fill:#23272d;font-weight:550}.tx.sel{fill:${ACC}}.tx.hov{fill:#4b5563}
 .ttl{fill:#23272d;font-weight:650}.sub{fill:#6a7079}
 .sbar{fill:none;stroke:#262a30;stroke-width:${k(1.2)}}.sbar2{fill:#262a30}
@@ -777,7 +854,7 @@ function itemSVG(it, cls = '') {
   const S = SYM[it.type] || SYM.box;
   return `<g class="it${cls}" transform="translate(${f(it.x)} ${f(it.y)}) rotate(${f(it.rot || 0)})${it.flip ? ' scale(-1 1)' : ''}">${S(it.w, it.h, it)}</g>`;
 }
-const showItem = (it, o) => !(o.lay && o.lay.furniture === false && LIB[it.type] && LIB[it.type].cat >= 2);
+const showItem = (it, o) => { const c = LIB[it.type] ? LIB[it.type].cat : 3; return !(o.lay && ((o.lay.furniture === false && (c === 2 || c === 3)) || (o.lay.people === false && c === 4))); };
 function itemsSVG(d, o) { return d.items.filter(it => showItem(it, o)).map(it => itemSVG(it, o.sel.has(it.id) ? ' sel' : (o.hover === it.id ? ' hov' : ''))).join(''); }
 function wallsSVG(d, o, jm) {
   let all = '', top = '';
@@ -813,6 +890,12 @@ function dimSVG(m, o, cls = '', label = null) {
   return `<g class="dim${cls}"><path d="${d}"/><text transform="translate(${f(mid.x)} ${f(mid.y)}) rotate(${f(ang)})" y="${f(-px(5))}" text-anchor="middle" font-size="${f(px(11.5))}" stroke-width="${f(px(3.2))}">${esc(label ?? fmtLen(Ld, o.units))}</text></g>`;
 }
 function dimsSVG(d, o) { if (o.noText || (o.lay && o.lay.dims === false)) return ''; return d.dims.map(m => dimSVG(m, o, o.sel.has(m.id) ? ' sel' : (o.hover === m.id ? ' hov' : ''))).join(''); }
+/* where a wall's length label sits (outside the walls), shared by drawing it and by clicking on it */
+function wallLabelGeom(w, Cw, o) {
+  const px = o.px, u = wU(w), n = perp(u), mid = mul(add(wA(w), wB(w)), .5), sg = dot(n, sub(mid, Cw)) >= 0 ? 1 : -1;
+  const p = add(mid, mul(n, sg * (w.thickness / 2 + px(8)))), ang = readableAng(u), flip = dot(rotP(P(0, 1), ang), mul(n, sg)) > 0;
+  return {p, ang, flip, y: flip ? px(8) : px(1)};
+}
 function labelsSVG(d, o, jm) {
   if (o.noText) return '';
   const px = o.px; let s = '';
@@ -821,11 +904,8 @@ function labelsSVG(d, o, jm) {
     const hideW = new Set(); o.sel.forEach(id => { if (id[0] === 'o') { const op = d.openings.find(q => q.id === id); if (op) hideW.add(op.wallId); } });
     for (const w of d.walls) {
       const Lw = wLen(w); if (Lw * o.s / o.ui < 34 || hideW.has(w.id)) continue;
-      const u = wU(w), n = perp(u), mid = mul(add(wA(w), wB(w)), .5), sg = dot(n, sub(mid, Cw)) >= 0 ? 1 : -1;
-      const p = add(mid, mul(n, sg * (w.thickness / 2 + px(8))));
-      const ang = readableAng(u), up = rotP(P(0, 1), ang);
-      const flip = dot(up, mul(n, sg)) > 0;
-      s += `<text class="wl" transform="translate(${f(p.x)} ${f(p.y)}) rotate(${f(ang)})" y="${f(flip ? px(8) : px(1))}" text-anchor="middle" font-size="${f(px(10.5))}" stroke-width="${f(px(3))}">${esc(fmtLen(Lw, o.units))}</text>`;
+      const g = wallLabelGeom(w, Cw, o);
+      s += `<text class="wl${o.hoverLen === w.id ? ' hov' : ''}" transform="translate(${f(g.p.x)} ${f(g.p.y)}) rotate(${f(g.ang)})" y="${f(g.y)}" text-anchor="middle" font-size="${f(px(10.5))}" stroke-width="${f(px(3))}">${esc(fmtLen(Lw, o.units))}</text>`;
     }
   }
   const showN = o.lay ? o.lay.names !== false : true, wantA = o.lay ? o.lay.areas !== false : d.showAreas;
@@ -856,7 +936,7 @@ function gridPaths(a, b, [mi, ma]) {
   for (let j = y0; j <= y1; j++) { const y = j * mi, seg = `M${f(a.x)} ${f(y)}H${f(b.x)}`; if (isMaj(y)) dM += seg; else dm += seg; }
   return `<path class="gmin" d="${dm}"/><path class="gmaj" d="${dM}"/>`;
 }
-const scrO = () => ({s: view.s, ui: 1, px: n => n / view.s, sel, hover: hoverId, units: doc.units});
+const scrO = () => ({s: view.s, ui: 1, px: n => n / view.s, sel, hover: hoverId, hoverLen, units: doc.units});
 
 let rq = 0;
 function requestRender() { if (!rq) rq = requestAnimationFrame(() => { rq = 0; render(); }); }
@@ -875,7 +955,6 @@ function render() {
   $('#stSnap').innerHTML = prefs.snap ? `Snap <b>${esc(fmtLen(snapStep()))}</b>` : 'Snap off';
   const tot = doc.rooms.reduce((s, r) => s + Math.abs(polyArea(r.pts)), 0);
   $('#stArea').innerHTML = doc.rooms.length ? `Rooms <b>${fmtArea(tot)}</b>` : '';
-  $('#empty').hidden = !(isEmptyDoc(doc) && !draft && !drag && tool === 'select');
 }
 
 /* ----- overlay: selection, handles, previews ----- */
@@ -887,7 +966,7 @@ function getHandles() {
     switch (id[0]) {
       case 'w': hs.push({k: 'wEnd', id, end: 'a', p: wA(ob)}, {k: 'wEnd', id, end: 'b', p: wB(ob)}); break;
       case 'i': if (sel.size === 1) {
-        hs.push({k: 'iSize', id, p: add(P(ob.x, ob.y), rotP(P(ob.w / 2, ob.h / 2), ob.rot || 0)), sq: 1});
+        if (!isPerson(ob.type)) hs.push({k: 'iSize', id, p: add(P(ob.x, ob.y), rotP(P(ob.w / 2, ob.h / 2), ob.rot || 0)), sq: 1});   // people are sized by their height
         hs.push({k: 'iRot', id, p: add(P(ob.x, ob.y), rotP(P(0, -ob.h / 2 - px(26)), ob.rot || 0)), stem: add(P(ob.x, ob.y), rotP(P(0, -ob.h / 2), ob.rot || 0))});
       } break;
       case 'r': if (sel.size === 1) ob.pts.forEach((p, i) => hs.push({k: 'rVert', id, idx: i, p, sq: 1})); break;
@@ -1231,20 +1310,19 @@ function splitWall(w) {
 function nextRoomName() { const names = new Set(doc.rooms.map(r => r.name)); let i = 1; while (names.has('Room ' + i)) i++; return 'Room ' + i; }
 function nextColor() { const used = doc.rooms.map(r => r.color); const c = ROOM_COLORS.slice(0, 6).find(c => !used.includes(c[0])); return (c || ROOM_COLORS[doc.rooms.length % 6])[0]; }
 function newRoom(pts) { return {id: nid('r'), name: nextRoomName(), color: nextColor(), pts: pts.map(p => P(p.x, p.y)), lx: 0, ly: 0, ceiling: null}; }
-function renameRoom(r, {fresh = false, removeOnCancel = false} = {}) {
+function renameRoom(r) {
   const b = ser();
-  inlineEdit(roomLabelPos(r), r.name, {
-    list: 'roomNames', placeholder: removeOnCancel ? 'Room name, or Esc to skip' : 'Room name',
-    onDone: v => { v = v.trim(); if (!v || v === r.name) return; r.name = v.slice(0, 80); if (!fresh) pushHist(b); afterChange(); },
-    onCancel: () => { if (removeOnCancel) { const prev = hist.u.pop(); if (prev) { doc = JSON.parse(prev); afterChange(); } } }
-  });
+  inlineEdit(roomLabelPos(r), r.name, {list: 'roomNames', placeholder: 'Room name',
+    onDone: v => { v = v.trim(); if (!v || v === r.name) return; r.name = v.slice(0, 80); pushHist(b); afterChange(); }});
 }
-function createRoom(pts, {walls = false, removeOnCancel = false} = {}) {
+const tapWord = () => penMode || matchMedia('(pointer: coarse)').matches ? 'Tap' : 'Click';
+/* a new room gets the next free name (Room 1, Room 2…) and is selected, so the panel can rename it; nothing pops up */
+function createRoom(pts, {walls = false} = {}) {
   const b = ser();
   if (walls) for (let i = 0; i < pts.length; i++) addWallSmart(pts[i], pts[(i + 1) % pts.length], doc.wallThickness);
   const r = newRoom(pts); doc.rooms.push(r);
   pushHist(b); sel.clear(); sel.add(r.id); afterChange();
-  renameRoom(r, {fresh: true, removeOnCancel});
+  if (!prefs.tipRename) { prefs.tipRename = true; savePrefs(); toast(`Added “${r.name}”. ${tapWord()} its name to rename it.`, 4500); }
   return r;
 }
 function detectFaces() {
@@ -1330,7 +1408,7 @@ function ghostSVG(g) {
     if (g.ok) { const w = byId(g.wallId); return w ? openingSVG({type: placeType, offset: g.offset, width: g.width, hinge: g.hinge, swing: g.swing}, w, ' ghost') : ''; }
     return `<g class="op ghost bad" transform="translate(${f(g.x)} ${f(g.y)})">${openingBody(placeType, g.width, doc.wallThickness)}</g>`;
   }
-  return itemSVG({type: placeType, x: g.x, y: g.y, w: g.w, h: g.h, rot: g.rot, flip: g.flip, steps: Math.round(g.h / 25)}, ' ghost');
+  return itemSVG({type: placeType, x: g.x, y: g.y, w: g.w, h: g.h, rot: g.rot, flip: g.flip, steps: Math.round(g.h / 25), style: personStyle(prefs.personStyle)}, ' ghost');
 }
 
 /* ================= pointer handling ================= */
@@ -1372,6 +1450,10 @@ svg.addEventListener('pointerdown', e => {
   if (e.button === 1 || (e.button === 0 && (spaceDown || tool === 'pan'))) { e.preventDefault(); drag = {type: 'pan', sp0: sp, tx: view.tx, ty: view.ty}; setCursor(); return; }
   if (e.button !== 0) return;
   cur.snap = snapFor(wp); updateGhost();
+  if (!e.shiftKey && labelTool() && !(tool === 'select' && hitHandle(wp))) {
+    const lw = wallLabelAt(sp);
+    if (lw) { drag = {type: 'wlabel', w: lw, sp0: sp}; updateHint(); requestRender(); return; }
+  }
   const fn = {select: selDown, wall: wallDown, room: roomDown, dim: dimDown, text: textDown, place: placeDown}[tool];
   if (fn) fn(e, wp, sp);
   updateHint(); requestRender();
@@ -1404,6 +1486,15 @@ svg.addEventListener('wheel', e => {
   zoomAt(sp, Math.exp(-dy * (e.ctrlKey ? .01 : .0016)));
   if (!drag) hoverMove();
 }, {passive: false});
+/* Safari on a Mac sends trackpad pinches as gesture events; other browsers send ctrl + wheel (above) */
+let gScale = null;
+svg.addEventListener('gesturestart', e => { e.preventDefault(); gScale = pointers.size || fingers.size ? null : (e.scale || 1); }, {passive: false});
+svg.addEventListener('gesturechange', e => {
+  e.preventDefault(); if (gScale == null || pointers.size || fingers.size) return;
+  const sc = e.scale || 1, r = sc / gScale; gScale = sc; if (!isFinite(r) || r <= 0) return;
+  const {w, h} = svgSize(); zoomAt(isFinite(e.clientX) ? evPt(e) : P(w / 2, h / 2), r);
+}, {passive: false});
+svg.addEventListener('gestureend', e => { e.preventDefault(); gScale = null; }, {passive: false});
 svg.addEventListener('dblclick', e => {
   const wp = toW(evPt(e));
   if (tool === 'wall' && draft) { finishWall(); return; }
@@ -1433,12 +1524,14 @@ function hoverMove() {
     hoverHandle = hitHandle(wp);
     const h = hoverHandle ? null : hitTest(wp); hoverId = h ? h.id : null;
   } else { hoverId = null; hoverHandle = null; }
+  const lw = hoverHandle || spaceDown ? null : wallLabelAt(cur.sp); hoverLen = lw ? lw.id : null;
   cur.snap = snapFor(wp); updateGhost(); setCursor();
 }
 function setCursor() {
   let c = 'default';
   if (drag?.type === 'pan') c = 'grabbing';
   else if (spaceDown || tool === 'pan') c = 'grab';
+  else if (hoverLen && !drag) c = 'pointer';
   else if (tool !== 'select') c = 'crosshair';
   else if (drag?.type === 'move' || drag?.type === 'opening') c = 'move';
   else if (hoverHandle) c = hoverHandle.k === 'iRot' ? 'alias' : 'pointer';
@@ -1454,8 +1547,9 @@ function selDown(e, wp, sp) {
   if (h) {
     if (e.shiftKey) { if (sel.has(h.id)) sel.delete(h.id); else sel.add(h.id); renderPanel(); if (!sel.has(h.id)) return; }
     else if (h.room && !sel.has(h.id)) { drag = {type: 'marquee', start: wp, cur: wp, sp0: sp, moved: false, add: false, clickRoom: h.id}; return; }
-    else if (!sel.has(h.id)) setSel([h.id]);
-    if (h.label) { const r = byId(h.id); drag = {type: 'rlabel', r, start: wp, ox: r.lx || 0, oy: r.ly || 0, before: ser()}; return; }
+    const wasSel = !e.shiftKey && sel.has(h.id) && sel.size === 1;
+    if (!sel.has(h.id)) setSel([h.id]);
+    if (h.label) { const r = byId(h.id); drag = {type: 'rlabel', r, start: wp, sp0: sp, wasSel, moved: false, ox: r.lx || 0, oy: r.ly || 0, before: ser()}; return; }
     if (sel.size === 1 && h.id[0] === 'o') {
       const o = byId(h.id), fr = opFrame(o);
       drag = {type: 'opening', o, before: ser(), wall0: o.wallId, grab: fr ? dot(sub(wp, fr.a), fr.u) - o.offset : 0}; return;
@@ -1488,6 +1582,7 @@ function dragMove(e) {
   const d = drag, wp = cur.wp, px = 1 / view.s;
   switch (d.type) {
     case 'pan': view.tx = d.tx + cur.sp.x - d.sp0.x; view.ty = d.ty + cur.sp.y - d.sp0.y; break;
+    case 'wlabel': if (dist(cur.sp, d.sp0) > 6) { drag = {type: 'pan', sp0: d.sp0, tx: view.tx, ty: view.ty}; dragMove(e); setCursor(); } break;   // dragging from a label moves the view
     case 'marquee': d.cur = wp; if (dist(cur.sp, d.sp0) > 4) d.moved = true; break;
     case 'move': {
       if (!d.moved && dist(cur.sp, d.sp0) < 3) return; d.moved = true;
@@ -1505,7 +1600,7 @@ function dragMove(e) {
       const q = snapPoint(wp, {from: d.from, skip: d.skip, skipWalls: d.skipWalls, rich: d.rich, lock: shiftDown});
       d.snapq = q.k && q.k !== 'grid' ? q : null; setRefs(d.refs, q); clampOpenings(); break;
     }
-    case 'rlabel': { let dx = wp.x - d.start.x, dy = wp.y - d.start.y; d.r.lx = d.ox + dx; d.r.ly = d.oy + dy; break; }
+    case 'rlabel': { if (!d.moved && dist(cur.sp, d.sp0) < 4) return; d.moved = true; let dx = wp.x - d.start.x, dy = wp.y - d.start.y; d.r.lx = d.ox + dx; d.r.ly = d.oy + dy; break; }
     case 'dOff': { const m = d.m, a = P(m.x1, m.y1), b = P(m.x2, m.y2); m.off = dimOffsetFor(a, b, wp); break; }
     case 'iRot': { const it = d.it; let a = Math.atan2(wp.y - it.y, wp.x - it.x) / D2R + 90; if (!altDown && !shiftDown) a = Math.round(a / 15) * 15; it.rot = ((Math.round(a * 100) / 100) % 360 + 360) % 360; break; }
     case 'iSize': {
@@ -1554,13 +1649,15 @@ function dragEnd(d, e) {
         return;
       }
       const raw = d.raw, ex = roomAt(raw);
-      if (ex) { setSel([ex.id]); renameRoom(ex); return; }
+      if (ex) { if (sel.size === 1 && sel.has(ex.id) && inBox(raw, roomLabelBox(ex))) renameRoom(ex); else setSel([ex.id]); return; }   // click a selected room's name to rename it
       const face = detectRoomAt(raw);
       if (face) { createRoom(face); return; }
       draft = {type: 'poly', pts: [d.a]}; return;
     }
     case 'pan': return;
     case 'tool': d.up(e, cur.wp); return;
+    case 'rlabel': if (!d.moved) { if (d.wasSel) renameRoom(d.r); return; } break;   // a second click on a selected room's name renames it
+    case 'wlabel': editWallLength(d.w); return;
   }
   if (d.type === 'vertex') removeDegenerate();
   if (d.before) {
@@ -1586,7 +1683,7 @@ function wallPoint(q) {
       const lp = labelPoint(pts);
       if (!roomAt(lp)) {
         const face = detectRoomAt(lp);
-        createRoom(face || pts, {removeOnCancel: true});
+        createRoom(face || pts);
       }
     }
   }
@@ -1641,10 +1738,62 @@ function placeAt(e, wp) {
   let id;
   change(() => {
     if (g.op) { const o = {id: nid('o'), wallId: g.wallId, type: placeType, offset: g.offset, width: g.width, hinge: g.hinge, swing: g.swing, height: null, sill: null}; doc.openings.push(o); id = o.id; }
-    else { const it = {id: nid('i'), type: placeType, x: g.x, y: g.y, w: g.w, h: g.h, rot: g.rot, flip: g.flip, label: ''}; if (placeType === 'stairs') it.steps = Math.max(2, Math.round(g.h / 25)); doc.items.push(it); id = it.id; }
+    else {
+      const it = {id: nid('i'), type: placeType, x: g.x, y: g.y, w: g.w, h: g.h, rot: g.rot, flip: g.flip, label: ''};
+      if (placeType === 'stairs') it.steps = Math.max(2, Math.round(g.h / 25));
+      if (isPerson(placeType)) { it.style = personStyle(prefs.personStyle); it.height = personDefaultHeight(it.style); fitPerson(it); }
+      doc.items.push(it); id = it.id;
+    }
   });
   if (e.shiftKey) { renderPanel(); return; }
   setTool('select'); setSel([id]);
+}
+
+/* ================= wall lengths ================= */
+const labelTool = () => tool === 'select' || ((tool === 'wall' || tool === 'room') && !draft);
+function wallLabelAt(sp) {   // the wall whose length label is under this screen point
+  if (!doc.showLengths || !doc.walls.length || !labelTool()) return null;
+  const o = scrO(), Cw = wallsCenter(doc), coarse = penMode || matchMedia('(pointer: coarse)').matches;
+  const hideW = new Set(); sel.forEach(id => { if (id[0] === 'o') { const op = byId(id); if (op) hideW.add(op.wallId); } });
+  let best = null, bd = Infinity;
+  for (const w of doc.walls) {
+    const Lw = wLen(w); if (Lw * view.s < 34 || hideW.has(w.id)) continue;
+    const g = wallLabelGeom(w, Cw, o), q = rotP(sub(sp, toS(g.p)), -g.ang);   // in the label's own frame, in screen pixels
+    const half = fmtLen(Lw).length * 3.2 + (coarse ? 10 : 5), cy = (g.flip ? 8 : 1) - 3.5, hh = coarse ? 14 : 9;
+    if (Math.abs(q.x) <= half && Math.abs(q.y - cy) <= hh) { const dd = Math.abs(q.y - cy) + Math.abs(q.x) * .1; if (dd < bd) { bd = dd; best = w; } }
+  }
+  return best;
+}
+/* Set a wall's length. Its right-hand end moves (the lower end for an upright wall). When the wall met at
+   that end turns a corner, that wall slides along too, so a rectangular room stays rectangular. */
+function setWallLength(w, L) {
+  const Lw = wLen(w); if (!(L > 0) || Math.abs(L - Lw) < .01) return;
+  const a = wA(w), b = wB(w), moveB = Math.abs(b.x - a.x) >= Math.abs(b.y - a.y) ? b.x >= a.x : b.y >= a.y;
+  const fixed = moveB ? a : b, mov = moveB ? b : a, delta = mul(norm(sub(mov, fixed)), L - Lw);
+  const all = allRefs(), atEnd = refsAt(mov, all), u = wU(w);
+  const wallsAt = (pt, not) => [...new Set(refsAt(pt, all).filter(r => r.wall && r.wall !== not).map(r => r.wall))].map(byId);
+  let slide = null;
+  const others = wallsAt(mov, w.id);
+  if (others.length === 1 && Math.abs(dot(u, wU(others[0]))) < .25) {
+    const w2 = others[0], u2 = wU(w2), far = dist(wA(w2), mov) < EPS ? wB(w2) : wA(w2);
+    if (!wallsAt(far, w2.id).some(w3 => Math.abs(cross(wU(w3), u2)) < .25)) slide = w2;   // a wall carrying straight on past it would bend, so don't
+  }
+  const moved = new Set(), refs = slide ? all.filter(r => segProj(P(r.o[r.kx], r.o[r.ky]), wA(slide), wB(slide)).d < EPS) : atEnd;
+  for (const r of refs) { if (moved.has(r.key)) continue; moved.add(r.key); r.o[r.kx] += delta.x; r.o[r.ky] += delta.y; }
+  for (const o of doc.openings) if (moved.has(o.wallId + 'a') && !moved.has(o.wallId + 'b')) { const ow = byId(o.wallId); if (ow) o.offset -= dot(delta, wU(ow)); }   // openings stay put
+  clampOpenings();
+}
+function editWallLength(w) {
+  if (!byId(w.id)) return;
+  if (tool === 'select') setSel([w.id]);
+  const g = wallLabelGeom(w, wallsCenter(doc), scrO()), b = ser();
+  inlineEdit(g.p, fmtLen(wLen(w)), {placeholder: 'Length', width: 130, onDone: v => {
+    v = v.trim(); if (!v || !byId(w.id)) return;
+    const L = parseLen(v);
+    if (!(L >= 1)) { toast(isImp(doc.units) ? 'That isn’t a length. Try 12\' 6" or 3.5 m.' : 'That isn’t a length. Try 3.5 or 350 cm.'); return; }
+    if (Math.abs(L - wLen(w)) < .05) return;
+    setWallLength(w, L); pushHist(b); afterChange();
+  }});
 }
 
 /* ================= inline editors ================= */
@@ -1652,8 +1801,8 @@ function inlineEdit(worldPt, value, opts) {
   const el = $('#inlineEdit'), sp = toS(worldPt), {w, h} = svgSize();
   el.value = value; el.placeholder = opts.placeholder || '';
   if (opts.list) el.setAttribute('list', opts.list); else el.removeAttribute('list');
-  el.hidden = false;
-  el.style.left = clamp(sp.x - 95, 6, w - 196) + 'px'; el.style.top = clamp(sp.y - 16, 6, h - 40) + 'px';
+  el.hidden = false; const W = opts.width || 190; el.style.width = W + 'px';
+  el.style.left = clamp(sp.x - W / 2, 6, w - W - 6) + 'px'; el.style.top = clamp(sp.y - 16, 6, h - 40) + 'px';
   inline = opts; try { el.focus(); } catch (_) {} requestAnimationFrame(() => { el.focus(); el.select(); });
 }
 function finishInline(ok) {
@@ -1721,7 +1870,10 @@ window.addEventListener('keydown', e => {
       else if (tool !== 'select') setTool('select');
       else if (sel.size) setSel([]);
       document.body.classList.remove('showLeft', 'showRight'); closeMenus(); requestRender(); return;
-    case 'Enter': if (tool === 'wall' && draft) finishWall(); else if (draft?.type === 'poly') finishPoly(); return;
+    case 'Enter':
+      if (tool === 'wall' && draft) finishWall(); else if (draft?.type === 'poly') finishPoly();
+      else if (tool === 'select' && sel.size === 1 && [...sel][0][0] === 'w') { e.preventDefault(); editWallLength(byId([...sel][0])); }
+      return;
     case 'Delete': case 'Backspace': e.preventDefault();
       if (tool === 'wall' && draft) undoWallSeg();
       else if (draft?.type === 'poly') { draft.pts.pop(); if (!draft.pts.length) draft = null; requestRender(); }
@@ -1770,17 +1922,28 @@ const TOOLS = [['select', 'Select', 'V'], ['wall', 'Wall', 'W'], ['room', 'Room'
 function buildToolbar() {
   $('#tools').innerHTML = TOOLS.map(([id, n, k]) => `<button class="tool" data-tool="${id}" aria-pressed="false" title="${n} (${k})"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round">${ICONS[id]}</svg>${n}<kbd>${k}</kbd></button>`).join('');
   let html = '';
+  const st = personStyle(prefs.personStyle);
   CATS.forEach((cn, ci) => {
-    html += `<div class="sech">${cn}</div><div class="lib">`;
-    for (const [key, L0] of Object.entries(LIB)) if (L0.cat === ci) html += `<button class="libb" data-place="${key}" aria-pressed="false" title="${L0.n}">${libThumb(key)}<span>${L0.n}</span></button>`;
+    html += ci === 4 ? `<div class="sech ppl"><span>${cn}</span><span class="seg sm" role="radiogroup" aria-label="Style">${STYLES.map(([v, n]) => `<button type="button" role="radio" data-style="${v}" aria-checked="${st === v}">${n}</button>`).join('')}</span></div><div class="lib">`
+      : `<div class="sech">${cn}</div><div class="lib">`;
+    for (const [key, L0] of Object.entries(LIB)) if (L0.cat === ci) html += `<button class="libb" data-place="${key}" aria-pressed="false" title="${L0.person ? `${L0.n} (${st})` : L0.n}">${libThumb(key)}<span>${L0.n}</span></button>`;
     html += '</div>';
   });
   $('#library').innerHTML = html;
+  document.querySelectorAll('[data-style]').forEach(b => b.addEventListener('click', () => setPersonStyle(b.dataset.style)));
   document.querySelectorAll('[data-tool]').forEach(b => b.addEventListener('click', () => { if (v3d) close3D(); setTool(b.dataset.tool); }));
   document.querySelectorAll('[data-place]').forEach(b => b.addEventListener('click', () => { if (v3d) close3D(); if (tool === 'place' && placeType === b.dataset.place) setTool('select'); else setTool('place', b.dataset.place); }));
 }
+function setPersonStyle(v) {   // Male / Female for the next person placed; keeps the current tool and the palette's scroll position
+  prefs.personStyle = personStyle(v); savePrefs();
+  const scroll = $('#left').scrollTop; buildToolbar(); $('#left').scrollTop = scroll;
+  document.querySelectorAll('.tool').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.tool === tool)));
+  document.querySelectorAll('.libb').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.place === placeType)));
+  updateGhost(); optsSig = ''; updateHint(); requestRender();
+}
 function libThumb(key) {
   const Lb = LIB[key];
+  if (Lb.person) return personThumb(key, personStyle(prefs.personStyle));
   if (Lb.op) {
     const W = Lb.w[0], t = 26, span = W + 50, wall = `<path fill="#262a30" d="M${-span / 2} ${-t / 2}H${-W / 2}V${t / 2}H${-span / 2}ZM${W / 2} ${-t / 2}H${span / 2}V${t / 2}H${W / 2}Z"/>`;
     const top = key === 'door' ? W + t / 2 + 4 : key === 'door2' ? W / 2 + t / 2 + 4 : t;
@@ -1805,14 +1968,19 @@ function renderToolOpts() {
   const el = $('#toolopts'); el.innerHTML = '';
   const thick = () => { const i = lenInput(doc.wallThickness, v => { change(() => doc.wallThickness = v); renderToolOpts(); }, {min: 1}); return h('label', {}, 'Wall thickness', i); };
   const chk = (label, key) => { const c = h('input', {type: 'checkbox'}); c.checked = !!prefs[key]; c.addEventListener('change', () => { prefs[key] = c.checked; savePrefs(); }); return h('label', {}, c, label); };
-  if (tool === 'wall') el.append(thick(), chk('Name the room when a loop closes', 'autoRoom'));
-  else if (tool === 'room') el.append(chk('Build walls around new rooms', 'roomWalls'), thick());
+  const drawSwitch = () => h('span', {class: 'seg sm', role: 'radiogroup', 'aria-label': 'Draw'}, ...[['wall', 'Walls', 'Draw walls corner by corner (W)'], ['room', 'Room', 'Drag out a whole room (R)']].map(([t, n, tip]) =>
+    h('button', {type: 'button', role: 'radio', 'aria-checked': String(tool === t), title: tip, onclick: () => { if (tool !== t) setTool(t); }}, n)));
+  const done = () => h('button', {onclick: () => setTool('select'), title: 'Stop drawing (Esc)'}, 'Done');
+  if (tool === 'wall') el.append(drawSwitch(), thick(), chk('Add a room when walls close a loop', 'autoRoom'), done());
+  else if (tool === 'room') el.append(drawSwitch(), chk('Build walls around new rooms', 'roomWalls'), thick(), done());
   else if (tool === 'dim') el.append(h('button', {onclick: autoDims}, 'Add overall dimensions'));
   if (tool === 'wall' && draft) el.prepend(h('button', {class: 'go', onclick: finishWall}, 'Finish'), h('button', {onclick: undoWallSeg}, 'Undo last'));
   if (tool === 'room' && draft?.type === 'poly') el.prepend(h('button', {class: 'go', onclick: finishPoly}, 'Close shape'), h('button', {onclick: () => { draft = null; updateHint(); requestRender(); }}, 'Cancel'));
   if (tool === 'dim' && draft) el.prepend(h('button', {onclick: () => { draft = null; updateHint(); requestRender(); }}, 'Cancel'));
   else if (tool === 'place' && placeType) {
     el.append(h('span', {class: 'tname'}, LIB[placeType].n));
+    if (isPerson(placeType)) el.append(h('span', {class: 'seg sm', role: 'radiogroup', 'aria-label': 'Style'}, ...STYLES.map(([v, n]) =>
+      h('button', {type: 'button', role: 'radio', 'aria-checked': String(personStyle(prefs.personStyle) === v), onclick: () => setPersonStyle(v)}, n))));
     if (!LIB[placeType].op) el.append(h('button', {onclick: () => rotateSel(90), title: 'Rotate (E)'}, 'Rotate 90°'));
     el.append(h('button', {onclick: () => flipSel(false), title: 'Flip (F)'}, LIB[placeType].op ? 'Flip swing' : 'Mirror'));
     el.append(h('button', {onclick: () => setTool('select')}, 'Done'));
@@ -1826,25 +1994,31 @@ function updateHint() {
   const one = sel.size === 1 ? byId([...sel][0]) : null;
   switch (tool) {
     case 'select':
-      if (!sel.size) s = 'Click to select, drag on empty space to box-select. Scroll to zoom; hold Space or the middle button and drag to pan.';
-      else if (one && one.id[0] === 'w') s = 'Drag to slide the wall; walls joined at its corners stretch to follow. Drag an end dot to reshape the corner. Delete removes it.';
+      if (!sel.size) s = 'Click to select, drag on empty space to box-select. Click a wall’s length to change it. Scroll to zoom; hold Space or the middle button and drag to pan.';
+      else if (one && one.id[0] === 'w') s = 'Drag to slide the wall; walls joined at its corners stretch to follow. Click its length (or press Enter) to type a new one. Delete removes it.';
       else if (one && one.id[0] === 'o') s = 'Drag along the wall, or onto another wall. Drag the square ends to resize. F flips the swing, Shift+F the hinge side.';
+      else if (one && one.id[0] === 'i' && isPerson(byId(one.id)?.type)) s = 'Drag to move. Q and E turn them 90° (Shift for 15°), F mirrors, Ctrl+D duplicates. Set their height in the panel.';
       else if (one && one.id[0] === 'i') s = 'Drag to move. Q and E rotate 90° (Shift for 15°), F mirrors, drag the corner square to resize, Ctrl+D duplicates.';
-      else if (one && one.id[0] === 'r') s = 'Double-click to rename. Drag the label to reposition it. Drag a corner square to reshape the room.';
+      else if (one && one.id[0] === 'r') s = 'Click the name to rename the room. Drag the name to move it, or a corner square to reshape the room.';
       else if (one && one.id[0] === 'd') s = 'Drag the middle square to move the dimension line, or the end dots to re-measure.';
       else s = `${sel.size} selected. Drag to move, arrow keys nudge, Delete removes.`;
       break;
-    case 'wall': s = draft ? 'Click to add a corner. Type a length and press Enter for an exact wall. Enter or double-click finishes; Backspace removes the last wall. Shift locks to 45°.' : 'Click to start a wall. Hold Alt to turn off snapping.'; break;
-    case 'room': s = draft ? 'Click to add points. Click the first point or press Enter to close the shape.' : 'Drag to draw a rectangular room, or type a size like 4 x 3. Click inside existing walls to name that space. Click point by point for other shapes.'; break;
+    case 'wall': s = draft ? 'Click to add a corner. Type a length and press Enter for an exact wall. Enter or double-click finishes; Backspace removes the last wall. Shift locks to 45°.' : 'Click to start a wall, then click each corner. Click a wall’s length to change it. Room draws a whole room at once.'; break;
+    case 'room': s = draft ? 'Click to add points. Click the first point or press Enter to close the shape.' : 'Drag to draw a rectangular room, or type a size like 4 x 3. Click inside walls you have drawn to make that space a room. Click point by point for other shapes.'; break;
     case 'dim': s = !draft ? 'Click the first point to measure from. Corners, wall ends and door edges snap.' : !draft.b ? 'Click the second point. Shift keeps it straight.' : 'Move the pointer to set how far the line sits from the wall, then click.'; break;
     case 'text': s = 'Click where the label should go, then type.'; break;
     case 'place': s = LIB[placeType]?.op ? 'Click on a wall to place it. The side you point at sets the swing. F flips, Shift+click places several.' : 'Click to place. Q and E rotate, F mirrors, Shift+click places several. Esc cancels.'; break;
     case 'pan': s = 'Drag to move around the plan.'; break;
   }
-  if (v3d) s = penMode || matchMedia('(pointer: coarse)').matches ? '3D preview: drag to look around, pinch to zoom, two fingers to move. Tap Plan to go back.'
-    : '3D preview: drag to look around, right-drag or Shift-drag to move, scroll to zoom. Esc goes back to the plan.';
+  if (v3d) {
+    const touch = penMode || matchMedia('(pointer: coarse)').matches, walking = v3d.mode === 'walk';
+    s = walking ? (touch ? 'Walking: tap the floor to walk there, drag to look around, pinch to step forward or back. Overview goes back.'
+        : 'Walking: click the floor to walk there, drag to look around, or use W A S D and the arrow keys (Shift to hurry). Esc goes back to the overview.')
+      : (touch ? '3D: drag to turn, pinch to zoom, two fingers to move, double-tap to zoom in on a spot. Walk lets you walk through the rooms.'
+        : '3D: drag to turn, right-drag or Shift-drag to move, scroll to zoom toward the pointer, double-click to zoom in on a spot. Walk lets you walk through the rooms.');
+  }
   if (penMode) s = s.replace(/^Click/, 'Tap').replace(/\bclick/g, 'tap').replace(/ Scroll to zoom; hold Space or the middle button and drag to pan\./, ' Pan with one finger, pinch to zoom.');
-  if (penMode && tool === 'wall') s = draft ? 'Tap the next corner, or drag the pencil to draw a wall. Tap Finish when you are done.' : 'Tap or press and drag with the pencil to draw walls. Fingers pan and zoom.';
+  if (penMode && tool === 'wall') s = draft ? 'Tap the next corner, or drag the pencil to draw a wall. Tap Finish when you are done.' : 'Tap or press and drag with the pencil to draw walls. Tap a wall’s length to change it. Fingers pan and zoom.';
   if (penMode && tool === 'dim' && draft && !draft.b) s = 'Tap the second point, or drag from the first point to it.';
   if (penMode && tool === 'dim' && draft && draft.b) s = 'Tap where the dimension line should sit.';
   $('#hint').textContent = s;
@@ -1908,7 +2082,8 @@ function panelDoc(p) {
     checkRow('Show the 3D preview (experimental)', prefs.show3D !== false, v => { prefs.show3D = v; savePrefs(); if (!v) close3D(); apply3DVisibility(); }));
   const area = doc.rooms.reduce((s, r) => s + Math.abs(polyArea(r.pts)), 0), wl = doc.walls.reduce((s, w) => s + wLen(w), 0);
   const s3 = h('div', {class: 'psec'}, h('div', {class: 'psh'}, 'Summary'), stat('Rooms', String(doc.rooms.length)), stat('Floor area', fmtArea(area)), stat('Wall length', fmtLen(wl)),
-    stat('Doors and windows', String(doc.openings.length)), stat('Objects', String(doc.items.length)));
+    stat('Doors and windows', String(doc.openings.length)), stat('Objects', String(doc.items.filter(it => !isPerson(it.type)).length)),
+    doc.items.some(it => isPerson(it.type)) ? stat('People', String(doc.items.filter(it => isPerson(it.type)).length)) : null);
   const rooms = doc.rooms.length ? h('div', {class: 'psec'}, h('div', {class: 'psh'}, 'Rooms'),
     ...doc.rooms.slice().sort((a, b) => Math.abs(polyArea(b.pts)) - Math.abs(polyArea(a.pts))).map(r => h('div', {class: 'stat', style: 'cursor:pointer', onclick: () => setSel([r.id])}, h('span', {}, h('span', {style: `display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:7px;border:1px solid rgba(0,0,0,.2);background:${r.color}`}), r.name), h('b', {}, fmtArea(Math.abs(polyArea(r.pts))))))) : null;
   const tips = h('div', {class: 'psec tips'}, h('div', {class: 'psh'}, 'Quick start'),
@@ -1928,11 +2103,11 @@ function panelDoc(p) {
 function panelWall(p, w) {
   const Lw = wLen(w), deg = ((-Math.atan2(w.y2 - w.y1, w.x2 - w.x1) / D2R) % 360 + 360) % 360;
   p.append(h('div', {class: 'psec'}, h('div', {class: 'ph'}, 'Wall'),
-    row('Length', lenInput(Lw, v => change(() => { const nb = add(wA(w), mul(wU(w), v)); setRefs(refsAt(wB(w)), nb); clampOpenings(); }), {min: 1})),
+    row('Length', lenInput(Lw, v => change(() => setWallLength(w, v)), {min: 1})),
     row('Thickness', lenInput(w.thickness, v => change(() => w.thickness = v), {min: 1})),
     row('Angle', numInput(deg, v => change(() => { const nb = add(wA(w), mul(P(Math.cos(-v * D2R), Math.sin(-v * D2R)), Lw)); setRefs(refsAt(wB(w)), nb); }))),
     h('div', {class: 'btnrow'}, pbtn('Split in two', () => splitWall(w)), pbtn('Delete', deleteSel, 'danger'))));
-  p.append(h('div', {class: 'psec tips'}, h('p', {}, 'Changing the length moves the wall’s end point. Walls joined at that corner follow it.')));
+  p.append(h('div', {class: 'psec tips'}, h('p', {}, 'Changing the length moves the wall’s right-hand end (the lower end of an upright wall). Walls joined there follow, and a rectangular room stays rectangular. You can also click the length on the plan.')));
 }
 function panelOpening(p, o) {
   const fr = opFrame(o); if (!fr) return;
@@ -1954,7 +2129,22 @@ function panelOpening(p, o) {
     h('div', {class: 'btnrow'}, isDoor ? pbtn('Flip swing', () => flipSel(false), '', 'F') : null, isDoor ? pbtn('Flip hinge', () => flipSel(true), '', 'Shift+F') : null, pbtn('Delete', deleteSel, 'danger'))));
   p.append(h('div', {class: 'psec tips'}, h('p', {}, 'Distances are measured along the wall’s centre line, from its end points to the edges of the opening.')));
 }
+function panelPerson(p, it) {
+  const pose = h('select', {}); PEOPLE.forEach(t => pose.append(h('option', {value: t}, LIB[t].n))); pose.value = it.type;
+  pose.addEventListener('change', () => change(() => { it.type = pose.value; fitPerson(it); }));
+  const style = h('div', {class: 'seg', role: 'radiogroup', 'aria-label': 'Style'}, ...STYLES.map(([v, n]) => h('button', {type: 'button', role: 'radio', 'aria-checked': String(it.style === v),
+    onclick: () => { if (it.style === v) return; change(() => { if (Math.abs(it.height - personDefaultHeight(it.style)) < .01) it.height = personDefaultHeight(v); it.style = v; fitPerson(it); }); }}, n)));
+  const sec = h('div', {class: 'psec'}, h('div', {class: 'ph'}, 'Person'),
+    row('Label', textInput(it.label || '', v => { it.label = v.slice(0, 60); }, {placeholder: 'Optional'})),
+    row('Pose', pose), h('div', {class: 'prow'}, h('span', {}, 'Style'), style),
+    row('Height', lenInput(it.height, v => change(() => { it.height = v; fitPerson(it); }), PERSON_LIMITS)),
+    h('div', {class: 'pnote'}, it.type === 'standing' || it.type === 'walking' ? `Takes up ${fmtLen(it.w)} × ${fmtLen(it.h)}` : 'Their height when standing'),
+    row('Rotation', numInput(it.rot || 0, v => change(() => it.rot = ((v % 360) + 360) % 360))),
+    h('div', {class: 'btnrow'}, pbtn('Rotate 90°', () => rotateSel(90), '', 'E'), pbtn('Mirror', () => flipSel(false), '', 'F'), pbtn('Duplicate', duplicateSel, '', 'Ctrl+D'), pbtn('Delete', deleteSel, 'danger')));
+  p.append(sec, h('div', {class: 'psec tips'}, h('p', {}, 'People are there for scale. They face the way their feet point; sitting figures go on a chair, sofa or bench.')));
+}
 function panelItem(p, it) {
+  if (isPerson(it.type)) return panelPerson(p, it);
   const isSt = it.type === 'stairs';
   const sec = h('div', {class: 'psec'}, h('div', {class: 'ph'}, LIB[it.type]?.n || 'Object'),
     row('Label', textInput(it.label || '', v => { it.label = v.slice(0, 60); }, {placeholder: 'Optional'})),
@@ -2015,7 +2205,7 @@ function setUnits(u) {
 }
 
 /* ================= export ================= */
-const PNG_DEF = {size: 2400, bg: 'white', title: true, names: true, areas: true, colors: true, lengths: true, dims: true, furniture: true, grid: false};
+const PNG_DEF = {size: 2400, bg: 'white', title: true, names: true, areas: true, colors: true, lengths: true, dims: true, furniture: true, people: true, grid: false};
 function buildExport(d, {maxPx = 2000, thumb = false, bg = 'white', lay = null} = {}) {
   const b = docBounds(d); if (!b) return null;
   const title = !thumb && !(lay && lay.title === false);
@@ -2121,7 +2311,7 @@ async function pngDialog(d, {back = null} = {}) {
     h('div', {class: 'psh'}, 'Background'), seg('bg', [['white', 'White'], ['none', 'Transparent']], 'Background'),
     h('div', {class: 'psh'}, 'Include'),
     chk('title', 'Title and scale bar'), chk('names', 'Room names'), chk('areas', 'Room areas'), chk('colors', 'Room colours'),
-    chk('lengths', 'Wall lengths'), chk('dims', 'Dimension lines'), chk('furniture', 'Furniture and fixtures'), chk('grid', 'Grid'));
+    chk('lengths', 'Wall lengths'), chk('dims', 'Dimension lines'), chk('furniture', 'Furniture and fixtures'), chk('people', 'People'), chk('grid', 'Grid'));
   update();
   const name = safeName(d.name) + '.png';
   const buttons = [{label: back ? 'Back' : 'Cancel', value: null}];
@@ -2235,7 +2425,7 @@ async function guardDirty() {
 }
 function loadDoc(d, id = null) {
   doc = normalizeDoc(d); current.id = id; current.saved = id ? ser() : (isEmptyDoc(doc) ? ser() : '');
-  hist.u = []; hist.r = []; sel.clear(); draft = null; setTool('select');
+  hist.u = []; hist.r = []; sel.clear(); draft = null; setTool(isEmptyDoc(doc) ? 'wall' : 'select');
   $('#units').value = doc.units; afterChange(); fit();
 }
 async function newDrawing() { if (!(await guardDirty())) return; loadDoc(newDoc(prefs.units)); }
@@ -2262,6 +2452,7 @@ function openDialog() {
   const draw = () => {
     list.innerHTML = '';
     const idx = readIndex();
+    if (isIOS() && isStandalone()) list.append(h('p', {class: 'muted', id: 'iosNote', style: 'margin:0 0 12px;font-size:12.5px'}, IOS_NOTE));
     if (!idx.length) { list.append(h('div', {class: 'emptylist'}, 'No saved drawings yet. Use Save to keep a drawing in this browser, or Import a .floorplan file.')); return; }
     const grid = h('div', {class: 'cards'});
     for (const e of idx) {
@@ -2328,8 +2519,10 @@ function showHelp() {
   const K = (k, d) => [h('kbd', {}, k), h('span', {}, d)];
   const body = h('div', {class: 'help'},
     h('h3', {}, 'Drawing'),
-    h('p', {}, 'Room (R): drag a rectangle and walls are built around it. Type a size such as 4 x 3 (or 12\' x 10\') and press Enter for an exact room. Click inside walls you have already drawn to name that space.'),
-    h('p', {}, 'Wall (W): click each corner. While drawing, type a length (3.5, 350cm, 12\'6") and press Enter. Close a loop to name the room; Enter, Esc or a double-click stops drawing.'),
+    h('p', {}, 'Room (R): drag a rectangle and walls are built around it. Type a size such as 4 x 3 (or 12\' x 10\') and press Enter for an exact room. Click inside walls you have already drawn to make that space a room.'),
+    h('p', {}, 'Wall (W): click each corner. While drawing, type a length (3.5, 350cm, 12\'6") and press Enter. Closing a loop adds a room; Enter, Esc or a double-click stops drawing. A new, empty drawing starts with the Wall tool, and the Walls / Room switch at the top changes between the two.'),
+    h('p', {}, 'Wall lengths: click (or tap) a length on the plan and type a new one. The right-hand end of the wall moves (the lower end of an upright wall), and a rectangular room stays rectangular.'),
+    h('p', {}, 'Room names: new rooms are called Room 1, Room 2 and so on. Select a room and click its name to rename it, double-click the room, or type in the panel.'),
     h('p', {}, 'Doors, windows, stairs and furniture: choose one in the library, then click. Doors and windows attach to the nearest wall and cut an opening in it.'),
     h('p', {}, 'Dimension (D): click two points, then click a third time to place the line. Wall lengths and room areas are shown automatically; turn them off in the panel on the right.'),
     h('h3', {}, 'Keyboard'),
@@ -2341,7 +2534,11 @@ function showHelp() {
     h('p', {}, 'Export → Drawing file downloads a .floorplan file. Import it (or drop it onto the page) on any device to add it to your drawings. Export → All saved drawings puts every drawing in one file, which is a good backup.'),
     h('p', {}, 'Export → PNG image lets you pick the size, a white or transparent background, and which labels and furniture to include.'),
     h('h3', {}, '3D preview (experimental)'),
-    h('p', {}, 'Switch to 3D in the bottom-left corner of the canvas to look at your plan in 3D. Drag to look around, right-drag (or two fingers) to move, and scroll or pinch to zoom. The preview only shows your plan; editing happens in Plan view, and changes you make in the panel or with undo appear in 3D straight away. Furniture and room names can be turned off in the bar at the top, and Save image keeps a picture of the current view.'),
+    h('p', {}, 'Switch to 3D in the bottom-left corner of the canvas to look at your plan in 3D. In Overview, drag to turn the model, right-drag (or two fingers) to move it, and scroll or pinch to zoom toward the pointer; double-click or double-tap a spot to zoom in on it. Arrow keys turn, W A S D move, + and − zoom, and 0 shows the whole plan again.'),
+    h('p', {}, 'Walk puts you inside at eye level. Click or tap the floor to walk there, drag to look around, or use W A S D and the arrow keys (hold Shift to hurry). Walls and windows stop you; doorways let you through. Esc or Overview takes you back out.'),
+    h('p', {}, 'The preview only shows your plan; editing happens in Plan view, and changes you make in the panel or with undo appear in 3D straight away. Furniture, people and room names can be turned off in the bar at the top, and Save image keeps a picture of the current view. When you come back to 3D, it opens where you left it.'),
+    h('h3', {}, 'People'),
+    h('p', {}, 'Under People in the library, choose Male or Female, then Standing, Walking, Sitting or Wheelchair and click to place a person for scale. Select one to change their pose, style or height. People can be hidden in PNG exports and in 3D.'),
     h('h3', {}, 'Heights'),
     h('p', {}, 'Ceiling, door, window and window sill heights for the whole drawing are under Heights in the panel when nothing is selected. Select a room to give it its own ceiling height, or a door or window to set its own height (and, for windows, how high the sill is above the floor). Select several rooms, doors or windows to set them all at once. In 3D, each stretch of wall rises to the ceiling of the room next to it.'),
     h('p', {}, 'The 3D preview is new, so it can be hidden under View in the panel on the right.'),
@@ -2352,7 +2549,8 @@ function showHelp() {
   showModal({title: 'How to use Floor Planner', wide: true, body, buttons: [{label: 'Got it', primary: true, value: null}]});
 }
 let toastT = 0;
-function toast(msg) { const t = $('#toast'); t.textContent = msg; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => t.hidden = true, 2600); }
+function toast(msg, ms = 2600) { const t = $('#toast'); t.textContent = msg; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => t.hidden = true, ms); }
+const IOS_NOTE = 'Drawings you made in Safari aren’t shared with the Home Screen app. To bring them over, open Floor Planner in Safari, choose Export → All saved drawings, then use Import here.';
 function closeMenus() { $('#exportMenu').hidden = true; $('#bExport').setAttribute('aria-expanded', 'false'); }
 
 /* ================= example ================= */
@@ -2399,7 +2597,6 @@ function wire() {
   $('#bExport').onclick = e => { e.stopPropagation(); const m = $('#exportMenu'); m.hidden = !m.hidden; $('#bExport').setAttribute('aria-expanded', String(!m.hidden)); };
   document.querySelectorAll('#exportMenu [data-x]').forEach(b => b.onclick = () => exportAs(b.dataset.x));
   document.addEventListener('click', e => { if (!e.target.closest('.menuwrap')) closeMenus(); });
-  $('#bExample').onclick = () => loadDoc(buildExample());
   $('#bImport').onclick = chooseImport;
   document.querySelectorAll('#viewSwitch button').forEach(b => b.addEventListener('click', () => { if (b.dataset.view === '3d') open3D(); else close3D(); }));
   const dz = $('#dropzone'), hasFiles = e => e.dataTransfer && [...(e.dataTransfer.types || [])].includes('Files'); let dragDepth = 0;
@@ -2421,9 +2618,10 @@ function wire() {
    The viewer lives in view3d.js and is loaded only when 3D is opened, so the editor never
    depends on it. It gets a plain copy of the drawing and can't change it. If it fails in any
    way, it is closed and the plan carries on. */
-const V3D_API = 2, EMPTY_3D = 'Nothing to show in 3D yet. Draw some walls or rooms on the plan first.';
-let v3d = null, v3dLoading = null;
-function v3dOptions() { return Object.assign({furniture: true, labels: true}, prefs.v3d || {}); }
+const V3D_API = 4, EMPTY_3D = 'Nothing to show in 3D yet. Draw some walls or rooms on the plan first.';
+let v3d = null, v3dLoading = null, v3dLast = null;   // v3dLast: how the 3D view was left, to pick up there next time
+const v3dKey = () => current.id || 'unsaved:' + doc.name;
+function v3dOptions() { return Object.assign({furniture: true, people: true, labels: true}, prefs.v3d || {}); }
 function apply3DVisibility() { $('#viewSwitch').hidden = prefs.show3D === false; }
 function load3D() {
   if (window.FP3D) return Promise.resolve(window.FP3D);
@@ -2491,7 +2689,7 @@ function model3D() {   // a plain, read-only copy of the drawing for the viewer
   }
   return {api: V3D_API, defaultHeight: doc.ceilingHeight, walls, openings,
     rooms: doc.rooms.map(r => { const l = roomLabelPos(r); return {name: r.name, color: r.color, ceiling: roomCeiling(r), pts: r.pts.map(q => ({x: q.x, y: q.y})), label: {x: l.x, y: l.y}}; }),
-    items: doc.items.map(it => { const r = roomAt(P(it.x, it.y)); return {type: it.type, x: it.x, y: it.y, w: it.w, h: it.h, rot: it.rot || 0, flip: !!it.flip, steps: it.steps || 0, cat: LIB[it.type] ? LIB[it.type].cat : 3, ceil: r ? roomCeiling(r) : doc.ceilingHeight}; })};
+    items: doc.items.map(it => { const r = roomAt(P(it.x, it.y)); return {type: it.type, x: it.x, y: it.y, w: it.w, h: it.h, rot: it.rot || 0, flip: !!it.flip, steps: it.steps || 0, cat: LIB[it.type] ? LIB[it.type].cat : 3, ceil: r ? roomCeiling(r) : doc.ceilingHeight, style: it.style || null, height: it.height || null}; })};
 }
 const emptyFor3D = () => !(doc.walls.length || doc.rooms.length || doc.items.length);
 function set3DSwitch(on) { document.querySelectorAll('#viewSwitch button').forEach(b => b.setAttribute('aria-pressed', String((b.dataset.view === '3d') === on))); }
@@ -2514,6 +2712,8 @@ async function open3D() {
   if (M.api !== V3D_API) { fail3D('The 3D view is out of date. Reload the page to update it.'); return; }
   try {
     token.ctrl = M.create($('#v3d'), model3D(), Object.assign(v3dOptions(), {units: doc.units,
+      view: v3dLast && v3dLast.key === v3dKey() ? v3dLast.view : null,
+      onMode: m => { if (v3d === token) set3DMode(m); },
       onClose: close3D,
       onError: err => fail3D('The 3D view ran into a problem and was closed.', err),
       onLost: () => status3D('The browser reset the graphics. If the 3D view doesn’t come back, go back to the plan and open it again.', true),
@@ -2523,13 +2723,19 @@ async function open3D() {
     fail3D(e && e.code === 'nowebgl' ? 'The 3D view needs WebGL, which isn’t available in this browser.' : 'The 3D view could not start.', e);
     return;
   }
+  set3DMode(token.ctrl.mode);
   status3D(emptyFor3D() ? EMPTY_3D : '', true);
+}
+function set3DMode(m) {   // Overview or Walk: the bar's switch, the cursor and the hint follow
+  if (!v3d) return; v3d.mode = m;
+  document.querySelectorAll('#v3dBar [data-nav]').forEach(b => b.setAttribute('aria-checked', String(b.dataset.nav === m)));
+  $('#v3d').classList.toggle('walking', m === 'walk'); updateHint();
 }
 function close3D() {
   const v = v3d; if (!v) return;
   v3d = null;
-  try { if (v.ctrl) v.ctrl.destroy(); } catch (e) { console.warn('3D view:', e); }
-  $('#v3d').hidden = true; $('#v3dBar').textContent = ''; status3D('');
+  try { if (v.ctrl) { v3dLast = {key: v3dKey(), view: v.ctrl.getView()}; v.ctrl.destroy(); } } catch (e) { console.warn('3D view:', e); }
+  $('#v3d').hidden = true; $('#v3d').classList.remove('walking'); $('#v3dBar').textContent = ''; status3D('');
   set3DSwitch(false); updateHint(); requestRender();
 }
 function fail3D(msg, err) { if (err) console.warn('3D view:', err); close3D(); toast(msg + ' Your drawing is not affected.'); }
@@ -2539,8 +2745,10 @@ function build3DBar() {
   const bar = $('#v3dBar'), p = v3dOptions(); bar.textContent = '';
   const set = (k, v) => { prefs.v3d = Object.assign({}, prefs.v3d || {}, {[k]: v}); savePrefs(); with3D(c => c.setOptions(v3dOptions())); };
   const chk = (label, key) => { const c = h('input', {type: 'checkbox'}); c.checked = !!p[key]; c.addEventListener('change', () => set(key, c.checked)); return h('label', {}, c, label); };
-  bar.append(h('span', {class: 'tname'}, '3D preview'), h('span', {class: 'beta'}, 'Experimental'),
-    chk('Furniture', 'furniture'), chk('Room names', 'labels'),
+  const navSw = h('span', {class: 'seg sm', role: 'radiogroup', 'aria-label': 'How to look around'}, ...[['orbit', 'Overview', 'Turn and zoom the whole plan'], ['walk', 'Walk', 'Walk through the rooms at eye level']].map(([m, n, tip]) =>
+    h('button', {type: 'button', role: 'radio', 'data-nav': m, title: tip, 'aria-checked': String((v3d && v3d.mode || 'orbit') === m), onclick: () => with3D(c => { if (c.mode !== m && !c.setMode(m) && m === 'walk') toast('Draw some walls or rooms first, then walk through them.'); })}, n)));
+  bar.append(h('span', {class: 'tname'}, '3D preview'), h('span', {class: 'beta'}, 'Experimental'), navSw,
+    chk('Furniture', 'furniture'), chk('People', 'people'), chk('Room names', 'labels'),
     h('button', {onclick: () => with3D(c => c.resetView())}, 'Reset view'),
     h('button', {onclick: () => with3D(c => c.topView())}, 'Top view'),
     h('button', {onclick: save3DImage}, preferShare() ? 'Save or share image' : 'Save image'));
@@ -2578,7 +2786,7 @@ function setupPWA() {
 
 function init() {
   buildToolbar(); wire(); setupPWA();
-  $('#iosNote').hidden = !(isIOS() && isStandalone() && !readIndex().length);
+  if (isIOS() && isStandalone() && !readIndex().length && !prefs.iosNoteShown) { prefs.iosNoteShown = true; savePrefs(); setTimeout(() => toast(IOS_NOTE, 9000), 600); }
   apply3DVisibility();
   let restored = false;
   try {
@@ -2593,12 +2801,12 @@ function init() {
   } catch (e) { restored = false; }
   if (!restored) { doc = newDoc(prefs.units); current.saved = ser(); }
   $('#units').value = doc.units;
-  setTool('select'); afterChange(); updateUndo();
+  setTool(isEmptyDoc(doc) ? 'wall' : 'select'); afterChange(); updateUndo();   // an empty drawing opens ready to draw walls
   requestAnimationFrame(fit);
 }
 init();
 window.__fp = {get doc() { return doc; }, view, sel, get tool() { return tool; }, parseLen, fmtLen, detectFaces, buildExport, buildExample, loadDoc, importFiles, readIndex,
-  open3D, close3D, model3D, get v3d() { return v3d && v3d.ctrl; }, get v3dOpen() { return !!v3d; }, get histLength() { return hist.u.length; }};
+  open3D, close3D, model3D, setPersonStyle, personSize, get prefs() { return prefs; }, lengthLabelAt: (x, y) => { const w = wallLabelAt(P(x, y)); return w ? w.id : null; }, get v3d() { return v3d && v3d.ctrl; }, get v3dOpen() { return !!v3d; }, get histLength() { return hist.u.length; }};
 })();
 </script>
 </body>
